@@ -34,4 +34,11 @@ def read_order(order_id: int, db: Session = Depends(get_db)):
 
 @app.get("/orders/", response_model=List[schemas.Order])
 def list_orders(skip: int = 0, limit: int = 10, status: Optional[str] = None, db: Session = Depends(get_db)):
-    return crud.list_orders(db=db, skip=skip, limit=limit, status=status) 
+    return crud.list_orders(db=db, skip=skip, limit=limit, status=status)
+
+@app.patch("/orders/{order_id}/status", response_model=schemas.Order)
+def update_order_status(order_id: int, status: schemas.OrderUpdateStatus, db: Session = Depends(get_db)):
+    updated_order = crud.update_order_status(db=db, order_id=order_id, status=status.status)
+    if not updated_order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return updated_order 

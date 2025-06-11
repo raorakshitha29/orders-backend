@@ -20,4 +20,12 @@ def list_orders(db: Session, skip: int = 0, limit: int = 10, status: str = None)
     query = db.query(models.Order)
     if status:
         query = query.filter(models.Order.status == status)
-    return query.offset(skip).limit(limit).all() 
+    return query.offset(skip).limit(limit).all()
+
+def update_order_status(db: Session, order_id: int, status: str):
+    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if order:
+        order.status = status
+        db.commit()
+        db.refresh(order)
+    return order 
