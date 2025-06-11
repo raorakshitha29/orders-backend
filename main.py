@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import models, schemas, crud
 from database import SessionLocal, engine
+from typing import List, Optional
 
 # Create the database tables
 models.Base.metadata.create_all(bind=engine)
@@ -29,4 +30,8 @@ def read_order(order_id: int, db: Session = Depends(get_db)):
     db_order = crud.get_order(db, order_id)
     if not db_order:
         raise HTTPException(status_code=404, detail="Order not found")
-    return db_order 
+    return db_order
+
+@app.get("/orders/", response_model=List[schemas.Order])
+def list_orders(skip: int = 0, limit: int = 10, status: Optional[str] = None, db: Session = Depends(get_db)):
+    return crud.list_orders(db=db, skip=skip, limit=limit, status=status) 
