@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-import models
+import models, schemas, crud
 from database import SessionLocal, engine
 
 # Create the database tables
@@ -18,4 +18,8 @@ def get_db():
 
 @app.get("/")
 def read_root():
-    return {"message": "Order Management API"} 
+    return {"message": "Order Management API"}
+
+@app.post("/orders/", response_model=schemas.Order)
+def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
+    return crud.create_order(db=db, order=order) 
